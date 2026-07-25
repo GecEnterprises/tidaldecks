@@ -25,6 +25,18 @@ The downstream Mixxx TidalDecks adapter may prototype capabilities that require
 library Load Codes or atomic load barriers, but those concepts must not leak
 into the generic OSC protocol without a generic use case.
 
+## Mixxx diagnostics UI
+
+Mixxx may expose a read-only, skin-integrated TidalDecks diagnostics panel next
+to the library. Its initial content is adapter-owned lifecycle information:
+per-deck request/load state and a bounded, deck-labelled command history.
+
+The panel must distinguish adapter observations from TidalDecks runtime state.
+Until the runtime publishes versioned status snapshots to the downstream
+adapter, runtime status is explicitly unavailable rather than inferred from
+Mixxx controls. The panel does not create scheduling, setlist, trigger, or
+automation controls in Mixxx.
+
 ## Scheduler
 
 The runtime should use one scheduler loop, not one thread per trigger or
