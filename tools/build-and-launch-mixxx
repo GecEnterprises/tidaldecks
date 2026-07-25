@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+root_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+mixxx_dir="$root_dir/repos/mixxx"
+build_dir=${MIXXX_BUILD_DIR:-/tmp/tidaldecks-mixxx-build}
+build_type=${MIXXX_BUILD_TYPE:-Debug}
+build_jobs=${MIXXX_BUILD_JOBS:-4}
+binary="$build_dir/mixxx"
+
+stop_mixxx() {
+    local pids=()
+    mapfile -t pids < <({ pgrep -x mixxx || true; pgrep -x Mixxx || true; } | sort -u)
+
+    if ((${#pids[@]} == 0)); then
+        return
+    fi
+
+    printf 'Stopping existing Mixxx process(es): %s\n' "${pids[*]}"
+    kill -TERM "${pids[@]}" || true
+    for _ in {1..50}; do
+        sleep 0.1
+        local alive=()
+        for pid in "${pids[@]}"; do
+            if kill -0 "$pid" 2>/dev/null; then
+                alive+=("$pid")
+            fi
+        done
+        if ((${#alive[@]} == 0)); then
+            return
+        fi
+        pids=("${alive[@]}")
+    done
+
+    printf 'Force-stopping Mixxx process(es): %s\n' "${pids[*]}"
+    kill -KILL "${pids[@]}" || true
+}
+
+stop_mixxx
+
+mkdir -p "$build_dir/.ccache"
+export CCACHE_DIR="$build_dir/.ccache"
+
+configure_log="$build_dir/configure.log"
+build_log="$build_dir/build.log"
+if ! cmake -S "$mixxx_dir" -B "$build_dir" \
+    -DCMAKE_BUILD_TYPE="$build_type" \
+    -DBUILD_TESTING=OFF \
+    -DOPTIMIZE=off >"$configure_log" 2>&1; then
+    tail -120 "$configure_log" >&2
+    exit 1
+fi
+if ! cmake --build "$build_dir" --target mixxx -j"$build_jobs" >"$build_log" 2>&1; then
+    tail -120 "$build_log" >&2
+    exit 1
+fi
+
+if [[ ! -x "$binary" ]]; then
+    printf 'Mixxx build completed but no executable was found at %s\n' "$binary" >&2
+    exit 1
+fi
+
+log_file="$build_dir/mixxx.log"
+nohup "$binary" >"$log_file" 2>&1 < /dev/null &
+printf 'Launched Mixxx (PID %s); log: %s\n' "$!" "$log_file"
