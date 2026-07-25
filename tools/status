@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+root_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+printf 'workspace: '
+git -C "$root_dir" status -sb
+for repo in repos/tidaldecks-lib repos/mixxx; do
+    printf '\n%s: ' "$repo"
+    git -C "$root_dir/$repo" status -sb
+done

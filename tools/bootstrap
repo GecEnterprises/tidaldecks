@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+root_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+git -C "$root_dir" submodule sync --recursive
+git -C "$root_dir" submodule update --init --recursive
+printf 'TidalDecks workspace ready at %s\n' "$root_dir"

@@ -1,0 +1,8 @@
+[submodule "repos/tidaldecks-lib"]
+	path = repos/tidaldecks-lib
+	url = https://github.com/GecEnterprises/tidaldecks-lib.git
+	branch = agent/mixer-crossfader
+[submodule "repos/mixxx"]
+	path = repos/mixxx
+	url = https://github.com/GecEnterprises/mixxx.git
+	branch = feature/tidal-decks-adapter

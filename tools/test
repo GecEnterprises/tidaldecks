@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+root_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+(cd "$root_dir/repos/tidaldecks-lib" && cabal test all)
+npm test --prefix "$root_dir/repos/tidaldecks-lib"
+printf 'Run the Mixxx C++ build/tests from repos/mixxx according to its build configuration.\n'
