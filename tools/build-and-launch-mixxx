@@ -43,17 +43,11 @@ export CCACHE_DIR="$build_dir/.ccache"
 
 configure_log="$build_dir/configure.log"
 build_log="$build_dir/build.log"
-if ! cmake -S "$mixxx_dir" -B "$build_dir" \
+cmake -S "$mixxx_dir" -B "$build_dir" \
     -DCMAKE_BUILD_TYPE="$build_type" \
     -DBUILD_TESTING=OFF \
-    -DOPTIMIZE=off >"$configure_log" 2>&1; then
-    tail -120 "$configure_log" >&2
-    exit 1
-fi
-if ! cmake --build "$build_dir" --target mixxx -j"$build_jobs" >"$build_log" 2>&1; then
-    tail -120 "$build_log" >&2
-    exit 1
-fi
+    -DOPTIMIZE=off 2>&1 | tee "$configure_log"
+cmake --build "$build_dir" --target mixxx -j"$build_jobs" 2>&1 | tee "$build_log"
 
 if [[ ! -x "$binary" ]]; then
     printf 'Mixxx build completed but no executable was found at %s\n' "$binary" >&2
