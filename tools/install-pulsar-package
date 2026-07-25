@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+root_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+package_dir="$root_dir/repos/tidaldecks-lib/editors/pulsar"
+
+if ! command -v pulsar >/dev/null 2>&1; then
+    printf 'Pulsar is not installed or is not available on PATH.\n' >&2
+    exit 1
+fi
+
+if [[ ! -f "$package_dir/package.json" ]]; then
+    printf 'TidalDecks Pulsar package not found at %s\n' "$package_dir" >&2
+    printf 'Initialize the workspace submodules with ./tools/bootstrap first.\n' >&2
+    exit 1
+fi
+
+printf 'Testing the TidalDecks Pulsar package...\n'
+npm test --prefix "$package_dir"
+
+printf 'Linking %s into Pulsar...\n' "$package_dir"
+pulsar -p link --force "$package_dir"
+
+package_listing=$(pulsar -p list --bare)
+installed_entry=
+while IFS= read -r entry; do
+    if [[ "$entry" == tidaldecks@* ]]; then
+        installed_entry=$entry
+        break
+    fi
+done <<<"$package_listing"
+
+if [[ -z "$installed_entry" ]]; then
+    printf 'Pulsar did not report the tidaldecks package after linking.\n' >&2
+    printf '%s\n' "$package_listing" >&2
+    exit 1
+fi
+
+printf 'Installed %s\n' "$installed_entry"
+printf 'Restart Pulsar, or reload its window, before evaluating a .tidaldecks file.\n'

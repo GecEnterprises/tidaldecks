@@ -26,6 +26,11 @@ After scaffolding, Mixxx adds the directory to project history and asks Pulsar
 to open both the project and `live.tidaldecks`. Mixxx does not install missing
 tools or packages and does not overwrite a non-empty directory.
 
+The workspace-level `tools/install-pulsar-package` command tests and force-links
+the local editor package, then verifies that Pulsar reports it as installed.
+The force-link behavior repairs stale development links while preserving the
+package's live connection to this checkout.
+
 ## Editor handoff
 
 The Pulsar package recognizes both development checkouts containing

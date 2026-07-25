@@ -28,6 +28,7 @@ Useful commands:
 ```shell
 ./tools/status
 ./tools/test
+./tools/install-pulsar-package
 ```
 
 The library package is currently still named `tidal-decks`; the repository is
