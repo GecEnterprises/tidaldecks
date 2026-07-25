@@ -27,15 +27,23 @@ into the generic OSC protocol without a generic use case.
 
 ## Mixxx diagnostics UI
 
-Mixxx may expose a read-only, skin-integrated TidalDecks diagnostics panel next
-to the library. Its initial content is adapter-owned lifecycle information:
-per-deck request/load state and a bounded, deck-labelled command history.
+Mixxx may expose a skin-integrated TidalDecks panel next to the library. Its
+diagnostic content is read-only adapter-owned lifecycle information: per-deck
+request/load state and a bounded, deck-labelled command history.
 
 The panel must distinguish adapter observations from TidalDecks runtime state.
 Until the runtime publishes versioned status snapshots to the downstream
 adapter, runtime status is explicitly unavailable rather than inferred from
-Mixxx controls. The panel does not create scheduling, setlist, trigger, or
-automation controls in Mixxx.
+Mixxx controls.
+
+The panel may also provide development-workspace conveniences that do not
+participate in playback: local GHC, Cabal, Pulsar, and editor-package discovery;
+recent project-folder history; creation of a standalone Haskell session
+project; and launching that project in Pulsar. Project scaffolds pin an explicit
+TidalDecks library revision, and the editor package selects the generated Cabal
+component when it starts its REPL. These conveniences do not make Mixxx the
+owner of Haskell evaluation, runtime lifecycle, scheduling, setlists, triggers,
+or automations.
 
 ## Scheduler
 
